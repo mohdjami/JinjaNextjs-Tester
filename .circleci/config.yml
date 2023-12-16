@@ -1,0 +1,61 @@
+version: 2.1
+
+node-executor: &node-executor
+  name: node/default
+  tag: "14.18"
+
+orbs:
+  node: circleci/node@5.1.0
+
+jobs:
+  test:
+    executor:
+      <<: *node-executor
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+          cache-version: v1
+      - run:
+          command: npm run test
+
+  lint:
+    executor:
+      <<: *node-executor
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+          cache-version: v1
+      - run:
+          command: npm run lint
+
+  prettier:
+    executor:
+      <<: *node-executor
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+          cache-version: v1
+      - run:
+          command: npm run prettier
+
+  build:
+    executor:
+      <<: *node-executor
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+          cache-version: v1
+      - run:
+          command: npm run build
+
+workflows:
+  test-and-build:
+    jobs:
+      - test
+      - lint
+      - prettier
+      - build

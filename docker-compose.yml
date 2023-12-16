@@ -1,0 +1,33 @@
+version: "3.9"
+
+x-node: &node
+  build:
+    context: .
+    dockerfile: Dockerfile.dev
+  working_dir: /app
+  volumes:
+    - ./:/app
+    # To persist the auth token for Vercel CLI.
+    - vercel_auth:/root/.local/share/com.vercel.cli/
+
+services:
+  npm:
+    <<: *node
+    command: ["npm", "install"]
+
+  server:
+    <<: *node
+    depends_on:
+      npm:
+        # run server after npm install
+        condition: service_completed_successfully
+    command: ["npm", "run", "vdev"]
+    ports:
+      - 3000:3000
+    environment:
+      - RUN_CONTEXT=
+      - FLASK_ENV=development
+      - FLASK_APP=index.py
+
+volumes:
+  vercel_auth:
